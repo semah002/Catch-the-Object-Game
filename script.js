@@ -467,6 +467,11 @@ function startGame() {
 
     updateUI();
 
+    // Clear any existing intervals first
+    clearInterval(intervals.fallingInterval);
+    clearInterval(intervals.timeBasedInterval);
+    stopGameTimer();
+
     // Spawn objects
     intervals.fallingInterval = setInterval(createObject, GAME_CONFIG.DEFAULT_SPAWN_INTERVAL);
 
@@ -644,6 +649,10 @@ if (DOM.pauseBtn) {
             DOM.pauseBtn.textContent = "Reprendre ▶";
             pauseMusic();
         } else {
+            // Clear any existing intervals first
+            clearInterval(intervals.fallingInterval);
+            clearInterval(intervals.timeBasedInterval);
+            
             intervals.fallingInterval = setInterval(createObject, GAME_CONFIG.DEFAULT_SPAWN_INTERVAL);
             intervals.timeBasedInterval = setInterval(() => {
                 if (gameState.lives > 0 && !gameState.paused) {
