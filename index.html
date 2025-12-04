@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catch The Object – Deluxe Edition</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css">
+
+</head>
+
+<body>
+
+    <div id="game-container">
+        <div id="top-bar">
+            <span id="score">Score : 0</span>
+            <span id="best-score">Best : 0</span>
+            <span id="lives">❤️❤️❤️</span>
+        </div>
+        
+        <!-- Controls: Info + Pause + Restart + Shop + Timer -->
+        <div class="mb-3 d-flex controls" style="gap:8px; align-items:center; width:100%;">
+            <button id="info-btn" class="btn btn-info">Info ℹ️</button>
+            <button id="pause-btn" class="btn btn-warning">Pause ⏸</button>
+            <button id="restart-ui-btn" class="btn btn-primary">Rejouer ↻</button>
+            <button id="shop-btn" class="btn btn-secondary">Shop 🛒</button>
+               <button id="mute-btn" class="btn btn-outline-secondary">🔈</button>
+            <div id="time-display" style="margin-left:auto; font-size:18px; font-weight:bold;">02:00</div>
+        </div>
+
+        <div id="game-area">
+            <img id="player" src="panier_normal.png">
+            <div id="stormText" style="display:none;">ALERTE TEMPÊTE !</div>
+        </div>
+    </div>
+    <!--  Game Over -->
+    <div class="modal fade" id="gameOverModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content text-center p-3">
+                <h3 id="finalScore"></h3>
+                <h5 id="recordMsg" class="text-success"></h5>
+
+                <div id="shop" style="display:none;">
+                    <h5>Shop – Choisis ton panier :</h5>
+                    <button class="btn btn-danger m-1" onclick="setSkin('red')">Panier Rouge</button>
+                    <button class="btn btn-success m-1" onclick="setSkin('green')">Panier Vert</button>
+                    <button class="btn btn-secondary m-1" onclick="setSkin('metal')">Panier Métal</button>
+                </div>
+
+                <button class="btn btn-primary mt-3" onclick="restartGame()">Rejouer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shop Modal  -->
+    <div class="modal fade" id="shopModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content text-center p-3">
+                <h5>Shop – Choisis ton panier :</h5>
+                <div class="mb-2">
+                    <button class="btn btn-danger m-1" onclick="setSkin('red')">Panier Rouge</button>
+                    <button class="btn btn-success m-1" onclick="setSkin('green')">Panier Vert</button>
+                    <button class="btn btn-secondary m-1" onclick="setSkin('metal')">Panier Métal</button>
+                </div>
+                <button class="btn btn-secondary mt-2" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+
+    <!-- Rules/Info  -->
+    <div class="modal fade" id="rulesModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content p-4" style="max-height:90vh; overflow-y:auto;">
+                <h2 class="text-center mb-4">🎉 Bienvenue & Règles du Jeu</h2>
+
+                <h4>🎯 Objectif</h4>
+                <p>Attrape les objets qui tombent avec ton panier pour marquer des points ! Fais attention à ne pas en manquer trop.</p>
+
+                <h4>❤️ Vies & Gameover</h4>
+                <p>Tu commences avec <strong>3 vies</strong>. Tu perds 1 vie si tu manques <strong>5 pommes</strong> d'affilée. Quand tes vies tombent à 0, c'est <strong>Game Over</strong>.</p>
+
+                <h4>⏳ Durée</h4>
+                <p>Le jeu dure <strong>2 minutes</strong>. Tu dois marquer le maximum de points avant la fin du temps !</p>
+
+                <hr>
+                <h4>🎯 Les Objets</h4>
+                <div class="border-start border-4 border-danger ps-3 mb-3">
+                    <strong>🍎 Pomme </strong><br>
+                    <span class="small">+1 point. Si tu manques 5 pommes d'affilée, tu perds 1 vie.</span>
+                </div>
+
+                <div class="border-start border-4 border-success ps-3 mb-3">
+                    <strong>⭐ Bonus </strong><br>
+                    <span class="small">+3 points. Si tu le manques, rien ne se passe.</span>
+                </div>
+
+                <div class="border-start border-4 border-warning ps-3 mb-3">
+                    <strong>💣 Bombe</strong><br>
+                    <span class="small">-10 points si tu la ramasses. </span>
+                </div>
+
+                <div class="border-start border-4 border-info ps-3 mb-3">
+                    <strong>🎖️ Golden </strong><br>
+                    <span class="small">+10 points ! C'est très rare, profite-le !</span>
+                </div>
+
+                <hr>
+                <h4>⚡ Événements Spéciaux</h4>
+                <p><strong>Tempête ⛈️</strong> : Quand tu atteins <strong>20 points</strong>, une tempête se déclenche ! Pendant <strong>8 secondes</strong>, seuls des <strong> pommes et bombes</strong>  tombent du ciel !</p>
+
+                <hr>
+                <h4>Raccourcis Clavier</h4>
+                <ul>
+                    <li><strong>← →</strong> : Deplacer ton panier</li>
+                    <li><strong>P</strong> : Pause / Reprendre</li>
+                    <li><strong>R</strong> : Rejouer</li>
+                    <li><strong>S</strong> : Ouvrir le Shop</li>
+                    <li><strong>I</strong> : Ouvrir les Infos</li>
+                </ul>
+
+                <hr>
+                <div class="text-center mt-4">
+                    <button class="btn btn-primary btn-lg" data-bs-dismiss="modal">C'est Parti ! ??</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+
+
+
